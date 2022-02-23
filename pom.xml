@@ -5,8 +5,6 @@
     <groupId>com.xiaoze</groupId>
     <artifactId>gameWeb</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>gameWeb</name>
-    <description>Demo project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -29,6 +27,10 @@
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>2.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
 
         <dependency>
@@ -78,7 +80,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.3.7.RELEASE</version>
                 <configuration>
-                    <mainClass>com.xiaoze.gameweb.GameWebApplication</mainClass>
+                    <mainClass>com.xiaoze.GameWebApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>
