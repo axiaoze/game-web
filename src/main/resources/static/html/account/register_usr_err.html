@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+  <link href="../../css/register.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="form-div">
+  <div class="reg-content">
+    <h1>Sign up</h1>
+    <br>
+    <span>已有帐号？</span> <a href="login.html">点击登录</a>
+  </div>
+  <form id="reg-form" action="/accounts/register" method="post">
+
+    <table>
+
+      <tr>
+        <td>Username:</td>
+        <td class="inputs">
+          <input name="username" type="text" id="username" onfocus="checkUse()">
+          <br>
+          <span id="username_err" class="err_msg" style="display: block">用户名不太受欢迎</span>
+        </td>
+
+      </tr>
+
+      <tr>
+        <td>Password:</td>
+        <td class="inputs">
+          <input name="password" type="password" id="password" onblur="checkPas()">
+          <br>
+          <span id="password_err" class="err_msg" style="display: none">请输入6~20位密码</span>
+        </td>
+      </tr>
+
+      <tr>
+        <td>RepeatPw:</td>
+        <td class="inputs">
+          <input name="repeatPw" type="password" id="repeatPw" onblur="checkRep()">
+          <br>
+          <span id="repeatPw_err" class="err_msg" style="display: none">密码重输错误</span>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Captcha:</td>
+        <td class="inputs">
+          <input name="checkCode" type="text" id="checkCode">
+          <a href="#" id="changeImg" onclick="checkCap()">
+            <img id="checkCodeImg" src="/accounts/captcha">
+          </a>
+          <br><br><br>
+        </td>
+      </tr>
+
+    </table>
+
+    <div class="buttons">
+      <input value="enroll" type="submit" id="reg_btn">
+    </div>
+    <br class="clear">
+  </form>
+
+</div>
+
+<script>
+  function checkUse(){
+    document.getElementById("username_err").style.display = "none";
+  }
+  function checkPas(){
+    var password = document.getElementById("password").value;
+    if (password.length < 6 || password.length > 20) {
+      document.getElementById("password_err").style.display = "block";
+    }else if (password.length >= 6 && password.length <= 20){
+      document.getElementById("password_err").style.display = "none";
+    }
+  }
+  function checkRep(){
+    var password = document.getElementById("password").value;
+    var repeatPw = document.getElementById("repeatPw").value;
+    if (password != repeatPw) {
+      document.getElementById("repeatPw_err").style.display = "block";
+    } else {
+      document.getElementById("repeatPw_err").style.display = "none";
+    }
+  }
+  function checkCap() {
+    //路径后面添加时间戳的目的是避免浏览器进行缓存静态资源
+    document.getElementById("checkCodeImg").src = "/accounts/captcha?"
+            + new Date().getMilliseconds();
+  }
+  setTimeout(checkCap,100)
+</script>
+</body>
+</html>

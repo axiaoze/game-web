@@ -1,4 +1,4 @@
-package com.xiaoze.gameweb;
+package com.xiaoze;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
