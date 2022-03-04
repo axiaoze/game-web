@@ -1,0 +1,55 @@
+html {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    background: url(../images/background5.jpg) no-repeat 0px 0px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    -moz-background-size: 100% 100%;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+#allDelete{
+    margin-left: 20px;
+    background:rgba(0,0,0,0.2);
+}
+
+#insert{
+    margin-left: 20px;
+    background:rgba(0,0,0,0.2);
+}
+
+.el-textarea__inner,.el-input__inner {
+    background: transparent !important;
+}
+
+.text .el-form-item__label{
+    color: yellow;
+}
+
+.button{
+    margin-left: 15px;
+    background:rgba(0,0,0,0.2);
+}
+
+.el-table, .el-table__expanded-cell{
+    background-color: #3f5c6d2c;
+}
+
+.el-table th,
+.el-table tr,
+.el-table td {
+    background-color: transparent;
+    color: black;
+}
+
+.
+

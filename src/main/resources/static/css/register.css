@@ -71,9 +71,6 @@ table {
     margin: 20px 0 20px 10px;
 }
 
-.form-div input[type="button"], .form-div input[type="submit"] {
-    margin: 10px 20px 0 0;
-}
 
 .form-div table {
     margin: 0 auto;

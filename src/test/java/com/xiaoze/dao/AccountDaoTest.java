@@ -19,6 +19,7 @@ public class AccountDaoTest {
     void textRepeat(){
         QueryWrapper<Account> wrapper = new QueryWrapper<>();
         wrapper.eq("username","b");
+        //根据条件查询一条数据，如果结果超过一条会报错
         Account account = mapper.selectOne(wrapper);
         System.out.println(account);
     }
