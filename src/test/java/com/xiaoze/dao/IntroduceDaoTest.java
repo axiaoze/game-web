@@ -132,6 +132,18 @@ public class IntroduceDaoTest {
     }
 
     @Test
+    public void testLimitByCondition(){
+        QueryWrapper<Introduce> wrapper = new QueryWrapper<>();
+        wrapper.like("name","切").or().
+                like("description","大鱼吃小鱼");
+        IPage<Introduce> page = new Page<>(1,5);
+        List<Introduce> Introduces = mapper.selectPage(page, wrapper).getRecords();
+        for (Introduce introduce : Introduces) {
+            System.out.println(introduce);
+        }
+    }
+
+    @Test
     public void testLike(){
         QueryWrapper<Introduce> wrapper = new QueryWrapper<>();
         wrapper.like("name","切");
@@ -176,6 +188,15 @@ public class IntroduceDaoTest {
         List<Introduce> introduces = mapper.selectList(wrapper);
         for (Introduce introduce : introduces) {
             System.out.println(introduce);
+        }
+    }
+
+    @Test
+    public void testGetPage(){
+        IPage page = new Page(1,5);
+        List list = mapper.selectPage(page, null).getRecords();
+        for (Object l : list) {
+            System.out.println(l);
         }
     }
 }

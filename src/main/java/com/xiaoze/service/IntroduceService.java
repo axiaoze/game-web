@@ -1,24 +1,27 @@
 package com.xiaoze.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.xiaoze.pojo.Introduce;
 
 import java.util.List;
 
 public interface IntroduceService {
-    int add(Introduce introduce);
+    Boolean add(Introduce introduce);
 
-    int remove(int id);
+    Boolean remove(Integer id);
 
-    int remove(int[] ids);
+    Boolean remove(Integer[] ids);
 
-    int modify(Introduce introduce);
+    Boolean modify(Introduce introduce);
 
-    List<Introduce> query();
+    List<Introduce> list();
 
-    Introduce query(int id);
+    Introduce query(Integer id);
 
     List<Introduce> query(Introduce introduce);
 
+    IPage<Introduce> getPage(Integer currentPage, Integer PageSize);
 
+    IPage<Introduce> LimitByCondition(Integer currentPage, Integer PageSize, Introduce introduce);
 
 }

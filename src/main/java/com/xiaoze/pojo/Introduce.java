@@ -2,7 +2,6 @@ package com.xiaoze.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +15,7 @@ import java.util.Date;
 @TableName("game_introduce")
 public class Introduce {
     //@TableId(type = IdType.AUTO)
-    private int id;
+    private Integer id;
     private String name;
     private String type;
     @TableField(value = "creation_time")

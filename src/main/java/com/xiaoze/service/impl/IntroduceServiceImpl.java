@@ -1,5 +1,8 @@
 package com.xiaoze.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xiaoze.mapper.IntroduceMapper;
 import com.xiaoze.pojo.Introduce;
 import com.xiaoze.service.IntroduceService;
@@ -8,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class IntroduceServiceImpl implements IntroduceService {
@@ -17,38 +19,65 @@ public class IntroduceServiceImpl implements IntroduceService {
     private IntroduceMapper mapper;
 
     @Override
-    public int add(Introduce introduce) {
-        return mapper.insert(introduce);
+    public Boolean add(Introduce introduce) {
+        return mapper.insert(introduce) > 0;
     }
 
     @Override
-    public int remove(int id) {
-        return mapper.deleteById(id);
+    public Boolean remove(Integer id) {
+        return mapper.deleteById(id) > 0;
     }
 
     @Override
-    public int remove(int[] ids) {
-        List<Integer> idList = Arrays.stream(ids).boxed().collect(Collectors.toList());
-        return mapper.deleteBatchIds(idList);
+    public Boolean remove(Integer[] ids) {
+        //List<Integer> idList = Arrays.stream(ids).boxed().collect(Collectors.toList());
+        List<Integer> idList = Arrays.asList(ids);
+        return mapper.deleteBatchIds(idList) > 0;
     }
 
     @Override
-    public int modify(Introduce introduce) {
-        return mapper.updateById(introduce);
+    public Boolean modify(Introduce introduce) {
+        return mapper.updateById(introduce) > 0;
     }
 
     @Override
-    public List<Introduce> query() {
+    public List<Introduce> list() {
         return mapper.selectList(null);
     }
 
     @Override
-    public Introduce query(int id) {
+    public Introduce query(Integer id) {
         return mapper.selectById(id);
     }
 
     @Override
     public List<Introduce> query(Introduce introduce) {
-        return null;
+        return mapper.selectList(new QueryWrapper(introduce));
+    }
+
+    @Override
+    public IPage<Introduce> getPage(Integer currentPage, Integer pageSize){
+        IPage<Introduce> page = new Page<>(currentPage,pageSize);
+        return mapper.selectPage(page,null);
+    }
+
+    @Override
+    public IPage<Introduce> LimitByCondition(Integer currentPage, Integer PageSize, Introduce introduce) {
+        String name = introduce.getName();
+        String description = introduce.getDescription();
+        QueryWrapper<Introduce> wrapper = new QueryWrapper<>();
+        if (name.length() != 0 && description.length() != 0) {
+            wrapper.like("name",name).or().
+                    like("description",description);
+        } else if (name.length() == 0 && description.length() != 0) {
+            wrapper.like("description",description);
+        } else if (name.length() != 0) {
+            wrapper.like("name", name);
+        } else {
+            wrapper = null;
+        }
+
+        IPage<Introduce> page = new Page<>(currentPage,PageSize);
+        return mapper.selectPage(page,wrapper);
     }
 }

@@ -13,7 +13,7 @@
 <div id="display">
     <el-form :inline="true" :model="introduce" class="demo-form-inline" >
         <el-form-item>
-            <el-button id="allDelete" type="danger" plain @click="deleteByIds">批量删除</el-button>
+            <el-button id="allDelete" type="danger" plain @click="handleBulkDelete">批量删除</el-button>
             <el-button id="insert" type="primary" plain @click="dialogVisible = true">新增</el-button>
         </el-form-item>
         <el-form-item label="游戏名" id="gameQuery" class="text">
@@ -23,18 +23,19 @@
             <el-input v-model="introduce.description" placeholder="游戏描述"></el-input>
         </el-form-item>
         <el-form-item>
-            <el-button class="button" type="info" @click="onSubmit" round>查询</el-button>
+            <el-button class="button" type="info" @click="handleRetrieval" round>查询</el-button>
         </el-form-item>
     </el-form>
     <!--列表展示-->
+    <!--列表展示不出，column中prop的属性值要与pojo实体类属性值一致-->
     <template>
         <el-table
                 ref="singleTable"
-                :data="tableData"
+                :data="tableList"
                 highlight-current-row
                 :header-cell-style="{background:'#11ffee00',color:'#adff2f'}"
-                @current-change="handCurrentRow"
-                style="width: 100%">
+                style="width: 100%"
+                @selection-change="handleSelectChange">
             <el-table-column
                     type="selection"
                     width="55">
@@ -44,14 +45,14 @@
                     width="50">
             </el-table-column>
             <el-table-column
-                    property="name"
+                    prop="name"
                     label="游戏名"
                     width="120"
                     align="center">
             </el-table-column>
             <el-table-column
                     id="filter"
-                    prop="tag"
+                    prop="type"
                     label="类型"
                     width="100"
                     align="center"
@@ -68,24 +69,31 @@
                     filter-placement="bottom-end">
                 <template slot-scope="scope">
                     <el-tag
-                            :type="scope.row.tag === '家' ? 'primary' : 'success'"
-                            disable-transitions>{{scope.row.tag}}</el-tag>
+                            :type="scope.row.type === '敏捷小游戏' ? '' :
+                                   scope.row.type === '益智小游戏' ? 'danger' :
+                                   scope.row.type === '射击小游戏' ? 'success' :
+                                   scope.row.type === '动作小游戏' ? 'success' :
+                                   scope.row.type === '休闲小游戏' ? 'info' :
+                                   scope.row.type === '体育小游戏' ? 'info' : 'warning'"
+                            disable-transitions>{{scope.row.type}}
+                    </el-tag>
                 </template>
             </el-table-column>
             <el-table-column
-                    prop="date"
+                    prop="creationTime"
                     label="创作时间"
                     sortable
                     width="180"
                     align="center">
                 <template slot-scope="scope">
                     <i class="el-icon-time"></i>
-                    <span style="margin-left: 10px">{{ scope.row.date }}</span>
+                    <span style="margin-left: 10px">{{ scope.row.creationTime }}</span>
                 </template>
+                </el-date-picker>
             </el-table-column>
             <el-table-column
                     label="描述"
-                    prop="desc"
+                    prop="description"
                     width="200"
                     align="center">
             </el-table-column>
@@ -97,27 +105,28 @@
                     <el-button
                             class="button"
                             size="mini"
-                            @click="updateVisible = true">编辑</el-button>
+                            @click="handleUpdate(scope.row)">编辑</el-button>
                     <el-button
                             class="button"
                             size="mini"
                             type="danger"
-                            @click="deleteById">删除</el-button>
+                            @click="handleDelete(scope.row)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
         <!--分页工具条-->
-        <el-pagination
+        <!--把current-change写成current-page卡了好久-->
+        <el-pagination v-if="paginationShow"
+                class="page"
                 align="center"
                 background
                 @size-change="handleSizeChange"
                 @current-change="handleCurrentChange"
-                :current-page="currentPage"
-                :page-sizes="[100, 200, 300, 400]"
-                :page-size="100"
+                :current-page="pagination.currentPage"
+                :page-size="4"
+                :page-sizes="[4, 8, 12, 16]"
                 layout="total, sizes, prev, pager, next, jumper"
-                :total="400"
-                class="page">
+                :total="pagination.total">
         </el-pagination>
     </template>
     <!--新增表单-->
@@ -131,15 +140,15 @@
             </el-form-item>
             <el-form-item label="游戏类型">
                 <el-select v-model="introduce.type" placeholder="请选择游戏类型">
-                    <el-option label="休闲" value="leisure"></el-option>
-                    <el-option label="体育" value="sport"></el-option>
-                    <el-option label="冒险" value="venture"></el-option>
-                    <el-option label="动作" value="action"></el-option>
-                    <el-option label="射击" value="shoot"></el-option>
-                    <el-option label="敏捷" value="agile"></el-option>
-                    <el-option label="棋牌" value="chess"></el-option>
-                    <el-option label="益智" value="puzzle"></el-option>
-                    <el-option label="策略" value="tactic"></el-option>
+                    <el-option label="休闲" value="休闲小游戏"></el-option>
+                    <el-option label="体育" value="体育小游戏"></el-option>
+                    <el-option label="冒险" value="冒险小游戏"></el-option>
+                    <el-option label="动作" value="动作小游戏"></el-option>
+                    <el-option label="射击" value="射击小游戏"></el-option>
+                    <el-option label="敏捷" value="敏捷小游戏"></el-option>
+                    <el-option label="棋牌" value="棋牌小游戏"></el-option>
+                    <el-option label="益智" value="益智小游戏"></el-option>
+                    <el-option label="策略" value="策略小游戏"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="创作时间">
@@ -147,8 +156,8 @@
                     <el-date-picker type="date" placeholder="选择时间" v-model="introduce.creationTime" style="width: 100%;"></el-date-picker>
                 </el-col>
             </el-form-item>
-            <el-form-item label="游戏地址">
-                <el-input placeholder="请输入网址" v-model="addressInput">
+            <el-form-item label="游戏网址">
+                <el-input placeholder="请输入网址" v-model="introduce.address">
                     <template slot="prepend">https://</template>
                     <el-button slot="append" icon="el-icon-search"></el-button>
                 </el-input>
@@ -157,8 +166,8 @@
                 <el-input type="textarea" v-model="introduce.description"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="onSubmit">立即创建</el-button>
-                <el-button>取消</el-button>
+                <el-button type="primary" @click="handleAdd">立即创建</el-button>
+                <el-button :plain="true" @click="cancelAdd">取消</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -167,40 +176,40 @@
             title="编辑游戏"
             :visible.sync="updateVisible"
             width="30%">
-        <el-form ref="form" :model="introduce" label-width="80px">
-            <el-form-item label="游戏名">
-                <el-input v-model="introduce.name"></el-input>
+        <el-form ref="form" :model="formData" label-width="80px">
+            <el-form-item label="游戏名" prop="name">
+                <el-input v-model="formData.name"></el-input>
             </el-form-item>
-            <el-form-item label="游戏类型">
-                <el-select v-model="introduce.type" placeholder="请选择游戏类型">
-                    <el-option label="休闲" value="leisure"></el-option>
-                    <el-option label="体育" value="sport"></el-option>
-                    <el-option label="冒险" value="venture"></el-option>
-                    <el-option label="动作" value="action"></el-option>
-                    <el-option label="射击" value="shoot"></el-option>
-                    <el-option label="敏捷" value="agile"></el-option>
-                    <el-option label="棋牌" value="chess"></el-option>
-                    <el-option label="益智" value="puzzle"></el-option>
-                    <el-option label="策略" value="tactic"></el-option>
+            <el-form-item label="游戏类型" prop="type">
+                <el-select v-model="formData.type" placeholder="请选择游戏类型">
+                    <el-option label="休闲" value="休闲小游戏"></el-option>
+                    <el-option label="体育" value="体育小游戏"></el-option>
+                    <el-option label="冒险" value="冒险小游戏"></el-option>
+                    <el-option label="动作" value="动作小游戏"></el-option>
+                    <el-option label="射击" value="射击小游戏"></el-option>
+                    <el-option label="敏捷" value="敏捷小游戏"></el-option>
+                    <el-option label="棋牌" value="棋牌小游戏"></el-option>
+                    <el-option label="益智" value="益智小游戏"></el-option>
+                    <el-option label="策略" value="策略小游戏"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="创作时间">
+            <el-form-item label="创作时间" prop="creationTime">
                 <el-col :span="11">
-                    <el-date-picker type="date" placeholder="选择时间" v-model="introduce.creationTime" style="width: 100%;"></el-date-picker>
+                    <el-date-picker type="date" placeholder="选择时间" v-model="formData.creationTime" style="width: 100%;"></el-date-picker>
                 </el-col>
             </el-form-item>
-            <el-form-item label="游戏地址">
-                <el-input placeholder="请输入网址" v-model="addressInput">
+            <el-form-item label="游戏网址" prop="address">
+                <el-input placeholder="请输入网址" v-model="formData.address">
                     <template slot="prepend">https://</template>
                     <el-button slot="append" icon="el-icon-search"></el-button>
                 </el-input>
             </el-form-item>
-            <el-form-item label="游戏描述">
-                <el-input type="textarea" v-model="introduce.description"></el-input>
+            <el-form-item label="游戏描述" prop="description">
+                <el-input type="textarea" v-model="formData.description"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="onSubmit">确认修改</el-button>
-                <el-button>取消</el-button>
+                <el-button type="primary" @click="handleEdit">确认修改</el-button>
+                <el-button :plain="true" @click="cancelUpdate">取消</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
@@ -217,6 +226,9 @@
 <script>
     new Vue({
         el:"#display",
+        created(){
+            this.query();
+        },
         data() {
             return {
                 introduce: {
@@ -224,53 +236,165 @@
                     name: '',
                     type: '',
                     creationTime: '',
-                    insertTime: '',
                     description: '',
                     address: ''
                 },
-                tableData: [{
-                    name: '王小虎',
-                    tag: '策略',
-                    date: '2016-05-03',
-                    desc: '非常可爱的Q版泡泡堂勋章游戏，玩游戏可以获得勋章哦，大家还等什么，快来挑战吧！'
-                }, {
-                    name: '王小虎',
-                    tag: '益智',
-                    date: '2016-05-01',
-                    desc: '非常可爱的Q版泡泡堂勋章游戏，玩游戏可以获得勋章哦，大家还等什么，快来挑战吧！'
-                }, {
-                    name: '王小虎',
-                    tag: '棋牌',
-                    date: '2016-05-02',
-                    desc: '非常可爱的Q版泡泡堂勋章游戏，玩游戏可以获得勋章哦，大家还等什么，快来挑战吧！'
-                }, {
-                    name: '王小虎',
-                    tag: '敏捷',
-                    date: '2016-05-02',
-                    desc: '非常可爱的Q版泡泡堂勋章游戏，玩游戏可以获得勋章哦，大家还等什么，快来挑战吧！'
-                }],
-                currentRow: null,
-                currentPage: 4,
-                addressInput: '',
+                multipleSelection: [],
+                introduceIds: [],
+                tableList: [],
+                formData: {},
+                paginationShow: true,
+                pagination: {    //分页模型数据
+                    currentPage: 1,
+                    pageSize: 4,
+                    total: 0
+                },
                 dialogVisible: false,
                 updateVisible: false
             }
         },
         methods: {
-            deleteById() {
-
+            query() {
+                //No converter found for return value of type: class xxx
+                /*axios.get("/introduces").then((res)=>{
+                    //console.log(res.data);
+                    this.tableList = res.data.data;
+                })*/
+                //Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer';
+                axios.get("/introduces/" + this.pagination.currentPage + "/" + this.pagination.pageSize).then((res)=>{
+                    /*
+                    this.pagination.currentPage = res.data.data.currentPage;
+                    this.pagination.pageSize = res.data.data.pageSize;
+                    */
+                    this.pagination.total = res.data.data.total;
+                    /*
+                    console.log(res.data.data.currentPage);
+                    console.log(res.data.data.pageSize);
+                    */
+                    this.tableList = res.data.data.records;
+                })
             },
-            handleCurrentRow(val) {
-                this.currentRow = val;
+            handleAdd() {
+                axios.post("/introduces",this.introduce).then((res)=>{
+                    if(res.data.flag){
+                        this.dialogVisible = false;
+                        this.$message.success("添加成功");
+                    }else{
+                        this.$message.error("添加失败");
+                    }
+                }).finally(()=>{
+                    this.query();
+                });
+            },
+            cancelAdd(){
+                this.dialogVisible = false;
+                this.$message({
+                    message: '已取消创建',
+                    center: true
+                });
+            },
+            handleRetrieval(){
+                axios.post("/introduces/" + this.pagination.currentPage + "/" + this.pagination.pageSize, this.introduce).then((res)=>{
+                    this.pagination.total = res.data.data.total;
+                    this.tableList = res.data.data.records;
+                })
+            },
+            handleSelectChange(val){
+                this.multipleSelection = val;
+            },
+            handleBulkDelete() {
+                this.$confirm('此操作将删除所选所有数据, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    //创建id数组
+                    for (let i = 0; i < this.multipleSelection.length; i++) {
+                        let selectionElement = this.multipleSelection[i];
+                        this.introduceIds[i] = selectionElement.id;
+                    }
+                    //提升this的作用范围
+                    var _this = this;
+                    axios.delete("/introduces/ordinal/" + this.introduceIds).then((res) =>{
+                        if(res.data.flag){
+                            this.query();
+                            this.$message({
+                                message: '已全部删除',
+                                type: 'success'
+                            });
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            handleUpdate(row) {
+                axios.get("/introduces/" + row.id).then((res)=>{
+                    //确保数据同步
+                    if(res.data.flag && res.data.data != null){
+                        this.updateVisible = true;
+                        this.formData = res.data.data;
+                    }else{
+                        this.$message.error("数据同步失败，自动刷新");
+                    }
+                }).finally(()=>{
+                    this.query();
+                });
+            },
+            handleEdit(){
+                axios.put("/introduces",this.formData).then((res)=>{
+                    console.log(res.data.flag);
+                    if(res.data.flag){
+                        this.updateVisible = false;
+                        this.$message.success("修改成功");
+                    }else{
+                        this.$message.error("修改失败");
+                    }
+                }).finally(()=>{
+                    this.query();
+                });
+            },
+            cancelUpdate(){
+                this.updateVisible = false;
+                this.$message({
+                    message: '已取消修改',
+                    center: true
+                });
+            },
+            handleDelete(row) {
+                this.$confirm("此操作将会永久删除当前数据，是否继续","提示",{
+                    type: 'info'
+                }).then(()=>{
+                    axios.delete("/introduces/" + row.id).then((res)=>{
+                        if(res.data.flag){
+                            this.$message("删除成功");
+                        }else{
+                            this.$message.error("数据同步失败，自动刷新");
+                        }
+                    }).finally(()=>{
+                        this.query();
+                    });
+                }).catch(()=>{
+                    this.$message.info("取消删除");
+                });
             },
             handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
+                this.pagination.pageSize = val;
+                this.query();
             },
             handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+                this.pagination.currentPage = val;
+                this.query();
             },
-            onSubmit() {
-                console.log('submit!');
+            filterTag(value, row) {
+                return row.tag === value;
+            },
+            filterHandler(value, row, column) {
+                const property = column['property'];
+                return row[property] === value;
             }
         }
 
