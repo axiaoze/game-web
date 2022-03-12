@@ -1,14 +1,16 @@
 package com.xiaoze.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.xiaoze.pojo.Introduce;
 import com.xiaoze.pojo.R;
 import com.xiaoze.service.IntroduceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/introduces")
@@ -65,5 +67,12 @@ public class IntroduceController {
     public R conditionLimit(@PathVariable Integer currentPage, @PathVariable Integer pageSize, @RequestBody Introduce introduce) {
         IPage<Introduce> page = service.LimitByCondition(currentPage, pageSize, introduce);
         return new R(null != page,page);
+    }
+
+    @GetMapping("/enter/{id}")
+    @CrossOrigin
+    public ModelAndView enter(@PathVariable Integer id) {
+        String address = service.getAddress(id);
+        return new ModelAndView("redirect:" + address);
     }
 }

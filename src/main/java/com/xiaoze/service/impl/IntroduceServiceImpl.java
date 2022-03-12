@@ -80,4 +80,13 @@ public class IntroduceServiceImpl implements IntroduceService {
         IPage<Introduce> page = new Page<>(currentPage,PageSize);
         return mapper.selectPage(page,wrapper);
     }
+
+    //获取游戏地址
+    @Override
+    public String getAddress(int id) {
+        QueryWrapper<Introduce> wrapper = new QueryWrapper<>();
+        wrapper.eq("id",id);
+        Introduce introduce = mapper.selectOne(wrapper);
+        return introduce.getAddress();
+    }
 }

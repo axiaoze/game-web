@@ -27,7 +27,6 @@
         </el-form-item>
     </el-form>
     <!--列表展示-->
-    <!--列表展示不出，column中prop的属性值要与pojo实体类属性值一致-->
     <template>
         <el-table
                 ref="singleTable"
@@ -45,11 +44,23 @@
                     width="50">
             </el-table-column>
             <el-table-column
+                    label="游戏名"
+                    width="120"
+                    align="center"
+                    show-overflow-tooltip>
+                <template slot-scope="scope">
+                    <a :href="scope.row.address" target="_blank">{{scope.row.name}}</a>
+                </template>
+            </el-table-column>
+            <!--<el-table-column
                     prop="name"
                     label="游戏名"
                     width="120"
                     align="center">
-            </el-table-column>
+                <template slot-scope="scope">
+                    <div @click='enter(scope.row)'>{{scope.row.name}}</div>
+                </template>
+            </el-table-column>-->
             <el-table-column
                     id="filter"
                     prop="type"
@@ -115,7 +126,6 @@
             </el-table-column>
         </el-table>
         <!--分页工具条-->
-        <!--把current-change写成current-page卡了好久-->
         <el-pagination v-if="paginationShow"
                 class="page"
                 align="center"
@@ -253,14 +263,13 @@
                 updateVisible: false
             }
         },
+        //Error in v-on handler: “TypeError: xxx is not a function“ method
         methods: {
             query() {
-                //No converter found for return value of type: class xxx
                 /*axios.get("/introduces").then((res)=>{
                     //console.log(res.data);
                     this.tableList = res.data.data;
                 })*/
-                //Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer';
                 axios.get("/introduces/" + this.pagination.currentPage + "/" + this.pagination.pageSize).then((res)=>{
                     /*
                     this.pagination.currentPage = res.data.data.currentPage;
@@ -293,15 +302,14 @@
                     center: true
                 });
             },
+            //分页查询
             handleRetrieval(){
                 axios.post("/introduces/" + this.pagination.currentPage + "/" + this.pagination.pageSize, this.introduce).then((res)=>{
                     this.pagination.total = res.data.data.total;
                     this.tableList = res.data.data.records;
                 })
             },
-            handleSelectChange(val){
-                this.multipleSelection = val;
-            },
+            //多选删除
             handleBulkDelete() {
                 this.$confirm('此操作将删除所选所有数据, 是否继续?', '提示', {
                     confirmButtonText: '确定',
@@ -314,7 +322,7 @@
                         this.introduceIds[i] = selectionElement.id;
                     }
                     //提升this的作用范围
-                    var _this = this;
+                    //var _this = this;
                     axios.delete("/introduces/ordinal/" + this.introduceIds).then((res) =>{
                         if(res.data.flag){
                             this.query();
@@ -329,6 +337,15 @@
                         type: 'info',
                         message: '已取消删除'
                     });
+                });
+            },
+            //复选框传参
+            handleSelectChange(val){
+                this.multipleSelection = val;
+            },
+            enter(row){
+                axios.get("/introduces/enter/" + row.id).then(()=>{
+                    console.log(row.id);
                 });
             },
             handleUpdate(row) {

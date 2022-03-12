@@ -24,4 +24,6 @@ public interface IntroduceService {
 
     IPage<Introduce> LimitByCondition(Integer currentPage, Integer PageSize, Introduce introduce);
 
+    String getAddress(int id);
+
 }

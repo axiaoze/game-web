@@ -199,4 +199,12 @@ public class IntroduceDaoTest {
             System.out.println(l);
         }
     }
+
+    @Test
+    public void testGetAddress(){
+        int id = 2;
+        QueryWrapper<Introduce> wrapper = new QueryWrapper();
+        wrapper.eq("id",id);
+        System.out.println(mapper.selectOne(wrapper));
+    }
 }

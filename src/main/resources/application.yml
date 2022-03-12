@@ -31,6 +31,9 @@ spring:
     view:
       prefix:
       suffix:
+  #自定义日期格式
+  jackson:
+    date-format: yyyy-MM-dd
 
 
 # mybatis配置信息
@@ -41,3 +44,4 @@ mybatis-plus:
       id-type: auto
     # 关闭日志图标
     banner: off
+
